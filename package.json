@@ -6,7 +6,6 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "postinstall": "node cp .env.example .env",
     "prebuild": "rimraf dist",
     "deploy": "npm run build:webpack && npm run deploy:cdk",
     "deploy:cdk": "cd aws && npx cdk deploy",
@@ -31,6 +30,8 @@
     "@nestjs/passport": "^10.0.0",
     "@nestjs/platform-express": "^10.0.3",
     "@nestjs/typeorm": "^10.0.2",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
     "helmet": "^7.0.0",
     "passport": "^0.6.0",
     "passport-http": "^0.3.0",
