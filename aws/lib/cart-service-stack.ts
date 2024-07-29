@@ -65,6 +65,8 @@ export class CartServiceStack extends cdk.Stack {
 
     /* Lambda server */
 
+    const FRONTEND_ORIGIN = cdk.Fn.importValue('DistributionOrigin');
+
     const lambdaServer = new lambda.Function(this, 'LambdaCartService', {
       runtime: lambda.Runtime.NODEJS_LATEST,
       timeout: cdk.Duration.seconds(10),
@@ -76,6 +78,7 @@ export class CartServiceStack extends cdk.Stack {
         DB_NAME: Env.DB_NAME,
         DB_USERNAME: Env.DB_USERNAME,
         DB_PASSWORD: Env.DB_PASSWORD,
+        FRONTEND_ORIGIN,
       },
     });
 
@@ -85,25 +88,6 @@ export class CartServiceStack extends cdk.Stack {
 
     const apigateway = new apigatewayv2.HttpApi(this, 'CartServiceApi', {
       createDefaultStage: true,
-      corsPreflight: {
-        allowCredentials: true,
-        allowMethods: [
-          apigatewayv2.CorsHttpMethod.GET,
-          apigatewayv2.CorsHttpMethod.PUT,
-          apigatewayv2.CorsHttpMethod.POST,
-          apigatewayv2.CorsHttpMethod.DELETE,
-          apigatewayv2.CorsHttpMethod.HEAD,
-        ],
-        allowOrigins: [cdk.Fn.importValue('DistributionOrigin')],
-        allowHeaders: [
-          'Content-Type',
-          'Authorization',
-          'X-Amz-Date',
-          'X-Api-Key',
-          'X-Amz-Security-Token',
-        ],
-        maxAge: cdk.Duration.days(1),
-      },
     });
 
     apigateway.addRoutes({
