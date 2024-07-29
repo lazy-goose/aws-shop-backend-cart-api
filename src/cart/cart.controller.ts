@@ -8,6 +8,7 @@ import {
   HttpStatus,
   ValidationPipe,
   Post,
+  Logger,
 } from '@nestjs/common';
 import { OrderService } from 'src/order/order.service';
 import { AppRequest, getUserIdFromRequest } from '../shared';
@@ -18,20 +19,41 @@ import { CartStatuses } from './models';
 
 @Controller('cart')
 export class CartController {
+  private readonly logger = new Logger(CartController.name);
+
   constructor(
     private cartService: CartService,
     private orderService: OrderService,
   ) {}
 
+  private log(value: string | object, context?: string) {
+    return typeof value === 'string'
+      ? this.logger.log(value, context)
+      : this.logger.log(JSON.stringify(value), context);
+  }
+
+  private logRequest({
+    method,
+    path,
+    params,
+    query,
+    headers,
+    body,
+  }: AppRequest) {
+    this.log({ method, path, params, query, headers, body }, 'REQUEST');
+  }
+
   @Get()
   async findUserCart(@Req() req: AppRequest) {
+    this.logRequest(req);
     const userId = getUserIdFromRequest(req);
-    const foundCart = await this.cartService.findOrCreateByUserId(userId);
+    const cart = await this.cartService.findOrCreateByUserId(userId);
+    this.log(cart, 'FIND CART');
     return {
       statusCode: HttpStatus.OK,
       message: 'OK',
       data: {
-        cart: foundCart,
+        cart,
       },
     };
   }
@@ -41,24 +63,25 @@ export class CartController {
     @Req() req: AppRequest,
     @Body(new ValidationPipe()) updateCartDto: UpdateUserCartDto,
   ) {
+    this.logRequest(req);
     const userId = getUserIdFromRequest(req);
-    const updatedCart = await this.cartService.updateByUserId(
-      userId,
-      updateCartDto,
-    );
+    const cart = await this.cartService.updateByUserId(userId, updateCartDto);
+    this.log(cart, 'UPDATE CART');
     return {
       statusCode: HttpStatus.OK,
       message: 'OK',
       data: {
-        cart: updatedCart,
+        cart,
       },
     };
   }
 
   @Delete()
   async clearUserCart(@Req() req: AppRequest) {
+    this.logRequest(req);
     const userId = getUserIdFromRequest(req);
-    await this.cartService.removeByUserId(userId);
+    const deleteResult = await this.cartService.removeByUserId(userId);
+    this.log(deleteResult, 'DELETE CART');
     return {
       statusCode: HttpStatus.OK,
       message: 'OK',
@@ -70,8 +93,10 @@ export class CartController {
     @Req() req: AppRequest,
     @Body(new ValidationPipe()) checkoutDto: CheckoutDto,
   ) {
+    this.logRequest(req);
     const userId = getUserIdFromRequest(req);
     const cart = await this.cartService.findByUserId(userId);
+    this.log(cart, 'CHECKOUT. FIND CART');
     if (!(cart && cart.items.length)) {
       return {
         statusCode: HttpStatus.BAD_REQUEST,
@@ -86,6 +111,7 @@ export class CartController {
       status: CartStatuses.ORDERED,
       total: cart.items.length,
     });
+    this.log(createdOrder, 'CHECKOUT. CREATE ORDER');
     return {
       statusCode: HttpStatus.OK,
       message: 'OK',
