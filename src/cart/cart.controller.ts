@@ -5,14 +5,18 @@ import {
   Put,
   Body,
   Req,
-  Post,
   HttpStatus,
+  ValidationPipe,
+  Post,
 } from '@nestjs/common';
-import { AppRequest, getUserIdFromRequest } from '../shared';
 import { OrderService } from 'src/order/order.service';
+import { AppRequest, getUserIdFromRequest } from '../shared';
 import { CartService } from './cart.service';
+import { UpdateUserCartDto } from './dto/update-user-cart.dto';
+import { CheckoutDto } from 'src/order/dto/checkout.dto';
+import { CartStatuses } from './models';
 
-@Controller('api/profile/cart')
+@Controller('cart')
 export class CartController {
   constructor(
     private cartService: CartService,
@@ -21,39 +25,40 @@ export class CartController {
 
   @Get()
   async findUserCart(@Req() req: AppRequest) {
-    const cart = await this.cartService.findOrCreateByUserId(
-      getUserIdFromRequest(req),
-    );
-
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'OK',
-      data: { cart, total: 10 },
-    };
-  }
-
-  @Put()
-  async updateUserCart(@Req() req: AppRequest, @Body() body) {
-    // TODO: validate body payload...
-    const cart = await this.cartService.updateByUserId(
-      getUserIdFromRequest(req),
-      body,
-    );
-
+    const userId = getUserIdFromRequest(req);
+    const foundCart = await this.cartService.findOrCreateByUserId(userId);
     return {
       statusCode: HttpStatus.OK,
       message: 'OK',
       data: {
-        cart,
-        total: 10,
+        cart: foundCart,
+      },
+    };
+  }
+
+  @Put()
+  async updateUserCart(
+    @Req() req: AppRequest,
+    @Body(new ValidationPipe()) updateCartDto: UpdateUserCartDto,
+  ) {
+    const userId = getUserIdFromRequest(req);
+    const updatedCart = await this.cartService.updateByUserId(
+      userId,
+      updateCartDto,
+    );
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'OK',
+      data: {
+        cart: updatedCart,
       },
     };
   }
 
   @Delete()
   async clearUserCart(@Req() req: AppRequest) {
-    await this.cartService.removeByUserId(getUserIdFromRequest(req));
-
+    const userId = getUserIdFromRequest(req);
+    await this.cartService.removeByUserId(userId);
     return {
       statusCode: HttpStatus.OK,
       message: 'OK',
@@ -61,35 +66,32 @@ export class CartController {
   }
 
   @Post('checkout')
-  async checkout(@Req() req: AppRequest, @Body() body) {
+  async checkout(
+    @Req() req: AppRequest,
+    @Body(new ValidationPipe()) checkoutDto: CheckoutDto,
+  ) {
     const userId = getUserIdFromRequest(req);
     const cart = await this.cartService.findByUserId(userId);
-
     if (!(cart && cart.items.length)) {
-      const statusCode = HttpStatus.BAD_REQUEST;
-      req.statusCode = statusCode;
-
       return {
-        statusCode,
+        statusCode: HttpStatus.BAD_REQUEST,
         message: 'Cart is empty',
       };
     }
-
-    const { id: cartId, items } = cart;
-    const total = 10;
-    const order = this.orderService.create({
-      ...body, // TODO: validate and pick only necessary data
+    const { id: cartId } = cart;
+    const createdOrder = await this.orderService.create({
+      ...checkoutDto,
       userId,
       cartId,
-      items,
-      total,
+      status: CartStatuses.ORDERED,
+      total: cart.items.length,
     });
-    this.cartService.removeByUserId(userId);
-
     return {
       statusCode: HttpStatus.OK,
       message: 'OK',
-      data: { order },
+      data: {
+        order: createdOrder,
+      },
     };
   }
 }

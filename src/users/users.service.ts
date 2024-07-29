@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { User } from './models';
+import { Body, Injectable, ValidationPipe } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from 'src/database/entities/user.entity';
 import { Repository } from 'typeorm';
+import { UserEntity } from 'src/database/entities/user.entity';
+import { UserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -15,7 +15,7 @@ export class UsersService {
     return this.users.findOneBy({ id });
   }
 
-  async createOne({ name, password }: User) {
+  async createOne({ name, password }: UserDto) {
     const user = this.users.create({
       name,
       password,
