@@ -21,7 +21,7 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
           database: env('DB_NAME'),
           username: env('DB_USERNAME'),
           password: env('DB_PASSWORD'),
-          synchronize: true,
+          synchronize: env('NODE_ENV') === 'development' ? true : false,
           autoLoadEntities: true,
           namingStrategy: new SnakeNamingStrategy(),
           ssl: ca ? { ca } : true,
