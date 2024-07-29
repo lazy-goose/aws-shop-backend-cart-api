@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import {
+  IsCreditCard,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -12,12 +13,10 @@ class PaymentDto {
   type: string;
 
   @IsString()
-  @IsNotEmpty()
   @IsOptional()
   address?: string;
 
-  @IsString()
-  @IsNotEmpty()
+  @IsCreditCard()
   @IsOptional()
   creditCard?: string;
 }
@@ -28,7 +27,6 @@ class DeliveryDto {
   type: string;
 
   @IsString()
-  @IsNotEmpty()
   @IsOptional()
   address?: string;
 }

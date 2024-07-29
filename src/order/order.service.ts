@@ -24,7 +24,7 @@ export class OrderService {
       await tem.update(
         CartEntity,
         { userId: newOrder.id },
-        { status: CartStatuses.ORDERED },
+        { status: CartStatuses.OPEN },
       );
       return newOrder;
     });

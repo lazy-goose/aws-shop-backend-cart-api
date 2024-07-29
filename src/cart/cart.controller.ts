@@ -5,11 +5,11 @@ import {
   Put,
   Body,
   Req,
-  HttpStatus,
   ValidationPipe,
   Post,
   Logger,
   UseGuards,
+  BadRequestException,
 } from '@nestjs/common';
 import { OrderService } from 'src/order/order.service';
 import { AppRequest, getUserIdFromRequest } from '../shared';
@@ -50,15 +50,9 @@ export class CartController {
   async findUserCart(@Req() req: AppRequest) {
     this.logRequest(req);
     const userId = getUserIdFromRequest(req);
-    const cart = await this.cartService.findOrCreateByUserId(userId);
+    const cart = await this.cartService.findOrCreateByUserId(userId, true);
     this.log(cart, 'FIND CART');
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'OK',
-      data: {
-        cart,
-      },
-    };
+    return cart;
   }
 
   @UseGuards(BasicAuthGuard)
@@ -71,13 +65,7 @@ export class CartController {
     const userId = getUserIdFromRequest(req);
     const cart = await this.cartService.updateByUserId(userId, updateCartDto);
     this.log(cart, 'UPDATE CART');
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'OK',
-      data: {
-        cart,
-      },
-    };
+    return cart;
   }
 
   @UseGuards(BasicAuthGuard)
@@ -87,10 +75,7 @@ export class CartController {
     const userId = getUserIdFromRequest(req);
     const deleteResult = await this.cartService.removeByUserId(userId);
     this.log(deleteResult, 'DELETE CART');
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'OK',
-    };
+    return 'Ok';
   }
 
   @UseGuards(BasicAuthGuard)
@@ -101,13 +86,10 @@ export class CartController {
   ) {
     this.logRequest(req);
     const userId = getUserIdFromRequest(req);
-    const cart = await this.cartService.findByUserId(userId);
+    const cart = await this.cartService.findByUserId(userId, true);
     this.log(cart, 'CHECKOUT. FIND CART');
-    if (!(cart && cart.items.length)) {
-      return {
-        statusCode: HttpStatus.BAD_REQUEST,
-        message: 'Cart is empty',
-      };
+    if (!cart || !cart.items.length) {
+      throw new BadRequestException('Cart is empty');
     }
     const { id: cartId } = cart;
     const createdOrder = await this.orderService.create({
@@ -118,12 +100,6 @@ export class CartController {
       total: cart.items.length,
     });
     this.log(createdOrder, 'CHECKOUT. CREATE ORDER');
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'OK',
-      data: {
-        order: createdOrder,
-      },
-    };
+    return createdOrder;
   }
 }

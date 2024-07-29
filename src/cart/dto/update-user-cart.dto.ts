@@ -6,7 +6,7 @@ export class CartItemDto {
   productId: string;
 
   @IsNumber()
-  @Min(1)
+  @Min(0)
   count: number;
 }
 
