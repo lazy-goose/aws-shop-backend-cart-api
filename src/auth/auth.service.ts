@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UsersService } from '../users/services/users.service';
+import { UsersService } from 'src/users/users.service';
 import { User } from '../users/models';
-import { contentSecurityPolicy } from 'helmet';
 
 @Injectable()
 export class AuthService {
@@ -57,7 +56,4 @@ export class AuthService {
       access_token: encodeUserToken(user),
     };
   }
-
-
-
 }

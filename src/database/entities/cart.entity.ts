@@ -1,4 +1,4 @@
-import { CartStatuses } from 'src/cart';
+import { CartStatuses } from 'src/cart/models';
 import {
   Column,
   CreateDateColumn,

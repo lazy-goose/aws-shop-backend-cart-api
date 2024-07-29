@@ -1,7 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { OrderEntity } from 'src/database/entities/order.entity';
-import { OrderService } from './services/order.service';
+import { OrderService } from './order.service';
 import { CartModule } from 'src/cart/cart.module';
 
 @Module({

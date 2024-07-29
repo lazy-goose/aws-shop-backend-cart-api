@@ -8,9 +8,9 @@ import {
   Post,
   HttpStatus,
 } from '@nestjs/common';
-import { OrderService } from '../order';
 import { AppRequest, getUserIdFromRequest } from '../shared';
-import { CartService } from './services';
+import { OrderService } from 'src/order/order.service';
+import { CartService } from './cart.service';
 
 @Controller('api/profile/cart')
 export class CartController {

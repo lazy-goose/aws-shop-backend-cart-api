@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { Cart } from '../models';
+import { Cart } from './models';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CartEntity } from 'src/database/entities/cart.entity';
 import { Repository } from 'typeorm';
+import { CartEntity } from 'src/database/entities/cart.entity';
 
 @Injectable()
 export class CartService {
