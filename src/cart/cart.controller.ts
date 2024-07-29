@@ -9,6 +9,7 @@ import {
   ValidationPipe,
   Post,
   Logger,
+  UseGuards,
 } from '@nestjs/common';
 import { OrderService } from 'src/order/order.service';
 import { AppRequest, getUserIdFromRequest } from '../shared';
@@ -16,6 +17,7 @@ import { CartService } from './cart.service';
 import { UpdateUserCartDto } from './dto/update-user-cart.dto';
 import { CheckoutDto } from 'src/order/dto/checkout.dto';
 import { CartStatuses } from './models';
+import { BasicAuthGuard } from 'src/auth';
 
 @Controller('cart')
 export class CartController {
@@ -43,6 +45,7 @@ export class CartController {
     this.log({ method, path, params, query, headers, body }, 'REQUEST');
   }
 
+  @UseGuards(BasicAuthGuard)
   @Get()
   async findUserCart(@Req() req: AppRequest) {
     this.logRequest(req);
@@ -58,6 +61,7 @@ export class CartController {
     };
   }
 
+  @UseGuards(BasicAuthGuard)
   @Put()
   async updateUserCart(
     @Req() req: AppRequest,
@@ -76,6 +80,7 @@ export class CartController {
     };
   }
 
+  @UseGuards(BasicAuthGuard)
   @Delete()
   async clearUserCart(@Req() req: AppRequest) {
     this.logRequest(req);
@@ -88,6 +93,7 @@ export class CartController {
     };
   }
 
+  @UseGuards(BasicAuthGuard)
   @Post('checkout')
   async checkout(
     @Req() req: AppRequest,
