@@ -79,6 +79,7 @@ export class CartServiceStack extends cdk.Stack {
         DB_USERNAME: Env.DB_USERNAME,
         DB_PASSWORD: Env.DB_PASSWORD,
         FRONTEND_ORIGIN,
+        NO_COLOR: 'true',
       },
     });
 
