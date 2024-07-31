@@ -22,10 +22,10 @@ export class CartEntity {
   @Column('uuid')
   userId: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamp' })
   createdAt: string;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: string;
 
   @Column({

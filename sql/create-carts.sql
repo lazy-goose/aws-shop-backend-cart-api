@@ -2,8 +2,8 @@ CREATE TYPE cart_statuses AS ENUM ('OPEN', 'ORDERED');
 CREATE TABLE carts (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(id),
-    created_at DATE NOT NULL,
-    updated_at DATE NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     status cart_statuses NOT NULL DEFAULT 'OPEN'
 );
 
