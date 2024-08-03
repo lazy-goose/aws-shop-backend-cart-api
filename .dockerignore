@@ -1,0 +1,15 @@
+.vscode/          # No need for build
+aws/              # No need for build
+sql/              # No need for build
+README.*          # No need for build
+.elasticbeanstalk # No need for build
+.gitignore        # No need for build
+.git/             # No need for build. Can contain sensitive data
+.dockerignore     # No need to include docker files in the image
+Dockerfile        # No need to include docker files in the image
+test/             # Prefer to run tests before image creation
+dist/             # We will rebuild the project
+node_modules/     # We will install deps directly in the container since some packages may contain binaries
+.env*             # Hide sensitive data
+*.log             # Just in case
+*.tmp             # Just in case
