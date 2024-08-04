@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "prebuild": "rimraf dist",
-    "deploy": "npm run build:webpack && npm run deploy:cdk",
+    "deploy": "sh ./eb/deploy.sh && npm run deploy:cdk",
     "deploy:cdk": "cd aws && npx cdk deploy",
     "build": "nest build",
     "build:webpack": "nest build --webpack --webpackPath webpack.config.js",
