@@ -1,5 +1,5 @@
 {
-  "name": "rs-checkout-api",
+  "name": "aws-shop-backend-cart-api",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -7,13 +7,13 @@
   "license": "UNLICENSED",
   "scripts": {
     "prebuild": "rimraf dist",
-    "deploy": "npm run build:webpack && npm run deploy:cdk",
+    "deploy": "sh ./eb/deploy.sh && npm run deploy:cdk",
     "deploy:cdk": "cd aws && npx cdk deploy",
     "build": "nest build",
     "build:webpack": "nest build --webpack --webpackPath webpack.config.js",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
-    "start:dev": "nest start --watch --entryFile main.dev",
+    "start:dev": "NODE_ENV=development nest start --watch --entryFile main.dev",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
@@ -21,7 +21,10 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "docker:build": "docker build -t cart-api:latest .",
+    "docker:run": "docker run --rm -p 4000:4000 --env-file .env cart-api:latest",
+    "docker:lint": "docker run --rm -i hadolint/hadolint < Dockerfile"
   },
   "dependencies": {
     "@codegenie/serverless-express": "^4.14.1",

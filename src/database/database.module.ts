@@ -1,3 +1,5 @@
+import path from 'path';
+import fs from 'fs';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -13,7 +15,10 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
       inject: [ConfigService],
       async useFactory(configService: ConfigService) {
         const env = (name: string) => configService.get<string>(name);
-        const ca = env('DB_CERTIFICATE');
+        const isDev = env('NODE_ENV') === 'development';
+        const ca = fs.readFileSync(
+          path.resolve(process.cwd(), 'certificates', 'eu-north-1-bundle.pem'),
+        );
         return {
           type: 'postgres',
           host: env('DB_HOST'),
@@ -21,10 +26,10 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
           database: env('DB_NAME'),
           username: env('DB_USERNAME'),
           password: env('DB_PASSWORD'),
-          synchronize: env('NODE_ENV') === 'development' ? true : false,
           autoLoadEntities: true,
           namingStrategy: new SnakeNamingStrategy(),
-          ssl: ca ? { ca } : true,
+          synchronize: false,
+          ssl: isDev ? { ca: ca.toString() } : true,
         };
       },
     }),
