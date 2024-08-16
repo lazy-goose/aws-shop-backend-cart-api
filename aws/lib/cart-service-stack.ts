@@ -25,7 +25,7 @@ export class CartServiceStack extends cdk.Stack {
       path: '/{proxy+}',
       methods: [apigatewayv2.HttpMethod.ANY],
       integration: new apigatewayv2Integrations.HttpUrlIntegration(
-        'BeanstalkHttpUrlIntegration',
+        'CartApiHttpUrlIntegration',
         joinUrl(Env.BEANSTALK_URL, '/{proxy}'),
       ),
     });

@@ -16,9 +16,8 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
       async useFactory(configService: ConfigService) {
         const env = (name: string) => configService.get<string>(name);
         const isDev = env('NODE_ENV') === 'development';
-        const ca = fs.readFileSync(
-          path.resolve(process.cwd(), 'certificates', 'eu-north-1-bundle.pem'),
-        );
+        // prettier-ignore
+        const localCert = path.resolve(process.cwd(), 'certificates', 'eu-north-1-bundle.pem');
         return {
           type: 'postgres',
           host: env('DB_HOST'),
@@ -29,7 +28,7 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
           autoLoadEntities: true,
           namingStrategy: new SnakeNamingStrategy(),
           synchronize: false,
-          ssl: isDev ? { ca: ca.toString() } : true,
+          ssl: isDev ? { ca: fs.readFileSync(localCert).toString() } : true,
         };
       },
     }),
